@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MAD.Integration.Common;
+using Microsoft.Extensions.Hosting;
+using System;
 
 namespace MAD.ActiveDirectory.Push
 {
@@ -6,7 +8,13 @@ namespace MAD.ActiveDirectory.Push
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            CreateHostBuilder(args).Build().Run();
         }
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            IntegrationHost.CreateDefaultBuilder(args)
+                .UseAppInsights()
+                .UseAspNetCore()
+                .UseStartup<Startup>();
     }
 }
