@@ -21,7 +21,7 @@ namespace MAD.ActiveDirectory.Push.Models
 
             modelBuilder.Entity<User>(cfg =>
             {
-                cfg.HasKey(y => y.Id);
+                cfg.HasKey(y => new { y.Id, y.ExtractedDate });
             });
         }
     }
