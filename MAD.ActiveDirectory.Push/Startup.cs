@@ -1,7 +1,9 @@
-﻿using MAD.ActiveDirectory.Push.Actions;
+﻿using Hangfire;
+using MAD.ActiveDirectory.Push.Actions;
 using MAD.ActiveDirectory.Push.Jobs;
 using MAD.ActiveDirectory.Push.Models;
 using MAD.ActiveDirectory.Push.Services;
+using MAD.Integration.Common.Jobs;
 using MAD.Integration.Common.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,14 +21,17 @@ namespace MAD.ActiveDirectory.Push
             serviceDescriptors.AddTransient<PrincipalContextFactory>();
 
             serviceDescriptors.AddScoped<EnumerateUsers>();
+            serviceDescriptors.AddScoped<UserJobController>();
             serviceDescriptors.AddScoped<UpdateUser>();
 
             serviceDescriptors.AddDbContext<ADDbContext>(optionsAction: (svc, builder) => builder.UseSqlServer(svc.GetRequiredService<ActiveDirectoryConfig>().ConnectionString));
         }
 
-        public async Task Configure()
+        public async Task Configure(ADDbContext dbContext, IGlobalConfiguration hangfireConfig)
         {
+            await dbContext.Database.MigrateAsync();
 
+            JobFactory.CreateRecurringJob<UserJobController>(nameof(UserJobController) + nameof(UserJobController.ExtractAndLoad), y => y.ExtractAndLoad());
         }
     }
 }

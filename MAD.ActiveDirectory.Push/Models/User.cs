@@ -27,6 +27,7 @@ namespace MAD.ActiveDirectory.Push.Models
         public string Mobile { get; set; }
         public string PhysicalDeliveryOfficeName { get; set; }
         public string C { get; set; }
+        public string Co { get; set; }
 
         public string ExtensionAttribute1 { get; set; }
         public string ExtensionAttribute2 { get; set; }
@@ -35,5 +36,7 @@ namespace MAD.ActiveDirectory.Push.Models
         public string ExtensionAttribute5 { get; set; }
 
         public string Manager { get; set; }
+
+        public DateTime ExtractedDate { get; set; }
     }
 }

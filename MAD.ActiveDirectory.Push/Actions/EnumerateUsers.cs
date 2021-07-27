@@ -25,6 +25,7 @@ namespace MAD.ActiveDirectory.Push.Actions
             using var up = new UserPrincipal(ctx);
             using var searcher = new PrincipalSearcher(up);
 
+            var extractDate = DateTime.Now;
             var findAll = searcher.FindAll();
 
             foreach (var r in findAll)
@@ -45,12 +46,14 @@ namespace MAD.ActiveDirectory.Push.Actions
                     Mobile = this.GetPropertyValue("mobile", de),
                     PhysicalDeliveryOfficeName = this.GetPropertyValue("physicalDeliveryOfficeName", de),
                     C = this.GetPropertyValue("c", de),
+                    Co = this.GetPropertyValue("co", de),
                     ExtensionAttribute1 = this.GetPropertyValue("extensionAttribute1", de),
                     ExtensionAttribute2 = this.GetPropertyValue("extensionAttribute2", de),
                     ExtensionAttribute3 = this.GetPropertyValue("extensionAttribute3", de),
                     ExtensionAttribute4 = this.GetPropertyValue("extensionAttribute4", de),
                     ExtensionAttribute5 = this.GetPropertyValue("extensionAttribute5", de),
-                    Manager = this.GetPropertyValue("manager", de)
+                    Manager = this.GetPropertyValue("manager", de),
+                    ExtractedDate = extractDate
                 };
 
                 yield return usr;
