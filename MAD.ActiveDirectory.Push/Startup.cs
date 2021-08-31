@@ -26,12 +26,5 @@ namespace MAD.ActiveDirectory.Push
 
             serviceDescriptors.AddDbContext<ADDbContext>(optionsAction: (svc, builder) => builder.UseSqlServer(svc.GetRequiredService<ActiveDirectoryConfig>().ConnectionString));
         }
-
-        public async Task Configure(ADDbContext dbContext, IGlobalConfiguration hangfireConfig)
-        {
-            await dbContext.Database.MigrateAsync();
-
-            JobFactory.CreateRecurringJob<UserJobController>(nameof(UserJobController) + nameof(UserJobController.ExtractAndLoad), y => y.ExtractAndLoad());
-        }
     }
 }
