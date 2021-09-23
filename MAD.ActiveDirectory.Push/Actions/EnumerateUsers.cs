@@ -52,6 +52,8 @@ namespace MAD.ActiveDirectory.Push.Actions
                     ExtensionAttribute3 = this.GetPropertyValue("extensionAttribute3", de),
                     ExtensionAttribute4 = this.GetPropertyValue("extensionAttribute4", de),
                     ExtensionAttribute5 = this.GetPropertyValue("extensionAttribute5", de),
+                    ExtensionAttribute6 = this.GetPropertyValue("extensionAttribute6", de),
+                    ExtensionAttribute7 = this.GetPropertyValue("extensionAttribute7", de),
                     Manager = this.GetPropertyValue("manager", de),
                     ExtractedDate = extractDate
                 };

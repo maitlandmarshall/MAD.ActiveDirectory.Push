@@ -34,6 +34,8 @@ namespace MAD.ActiveDirectory.Push.Models
         public string ExtensionAttribute3 { get; set; }
         public string ExtensionAttribute4 { get; set; }
         public string ExtensionAttribute5 { get; set; }
+        public string ExtensionAttribute6 { get; set; }
+        public string ExtensionAttribute7 { get; set; }
 
         public string Manager { get; set; }
 
