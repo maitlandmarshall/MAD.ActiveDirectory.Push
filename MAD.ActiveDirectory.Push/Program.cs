@@ -1,11 +1,5 @@
-﻿using MAD.ActiveDirectory.Push.Jobs;
-using MAD.ActiveDirectory.Push.Models;
-using MAD.Integration.Common;
-using MAD.Integration.Common.Jobs;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+﻿using MAD.Integration.Common;
 using Microsoft.Extensions.Hosting;
-using System;
 
 namespace MAD.ActiveDirectory.Push
 {
@@ -13,16 +7,7 @@ namespace MAD.ActiveDirectory.Push
     {
         static void Main(string[] args)
         {
-            var host = CreateHostBuilder(args).Build();
-            MigrateAndInitialize(host.Services);
-            host.Run();
-        }
-
-        static void MigrateAndInitialize(IServiceProvider services)
-        {
-            var dbContext = services.GetRequiredService<ADDbContext>();
-            dbContext.Database.Migrate();
-            JobFactory.CreateRecurringJob<UserJobController>(nameof(UserJobController) + nameof(UserJobController.ExtractAndLoad), y => y.ExtractAndLoad());
+            CreateHostBuilder(args).Build().Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

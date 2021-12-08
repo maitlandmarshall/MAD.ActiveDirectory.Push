@@ -12,5 +12,11 @@ namespace MAD.ActiveDirectory.Push
         public string Domain { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
+
+        public string PowerBIUsername { get; set; }
+        public string PowerBIPassword { get; set; }
+        public string PowerBIClientId { get; set; }
+        public string PowerBIWorkspaceId { get; set; }
+        public string PowerBIDataSetId { get; set; }
     }
 }

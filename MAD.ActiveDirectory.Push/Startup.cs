@@ -24,7 +24,17 @@ namespace MAD.ActiveDirectory.Push
             serviceDescriptors.AddScoped<UserJobController>();
             serviceDescriptors.AddScoped<UpdateUser>();
 
+            serviceDescriptors.AddTransient<AadAuthClient>();
+            serviceDescriptors.AddTransient<AdWritebackDataClient>();
+
             serviceDescriptors.AddDbContext<ADDbContext>(optionsAction: (svc, builder) => builder.UseSqlServer(svc.GetRequiredService<ActiveDirectoryConfig>().ConnectionString));
+        }
+
+        public void PostConfigure(ADDbContext dbContext, IRecurringJobFactory recurringJobFactory)
+        {
+            dbContext.Database.Migrate();
+
+            recurringJobFactory.CreateRecurringJob<UserJobController>(nameof(UserJobController) + nameof(UserJobController.ExtractAndLoad), y => y.ExtractAndLoad());
         }
     }
 }
