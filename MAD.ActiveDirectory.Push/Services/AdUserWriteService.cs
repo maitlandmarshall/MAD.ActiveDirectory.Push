@@ -19,9 +19,9 @@ namespace MAD.ActiveDirectory.Push.Services
 
         public AdUserUpdateTransaction StartUpdateTransaction(AdWritebackData adWritebackData)
         {
-            using var ctx = this.principalContextFactory.Create();
-            using var userPrincipal = UserPrincipal.FindByIdentity(ctx, IdentityType.UserPrincipalName, adWritebackData.Email);
-            using var directoryEntry = userPrincipal.GetUnderlyingObject() as DirectoryEntry;
+            var ctx = this.principalContextFactory.Create();
+            var userPrincipal = UserPrincipal.FindByIdentity(ctx, IdentityType.UserPrincipalName, adWritebackData.Email);
+            var directoryEntry = userPrincipal.GetUnderlyingObject() as DirectoryEntry;
 
             // Get the update targets, which is just deltas to avoid updating fields that have no change
             var updateTargets = this.GetUpdateTargetDeltas(directoryEntry, adWritebackData).ToList();

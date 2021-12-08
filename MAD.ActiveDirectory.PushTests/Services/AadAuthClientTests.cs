@@ -11,6 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Hangfire;
 using MAD.ActiveDirectory.Push.Models;
 using Microsoft.EntityFrameworkCore;
+using System.DirectoryServices.AccountManagement;
+using System.DirectoryServices;
 
 namespace MAD.ActiveDirectory.Push.Services.Tests
 {
@@ -67,9 +69,13 @@ namespace MAD.ActiveDirectory.Push.Services.Tests
         [TestMethod]
         public async Task AdWritebackCommitTest()
         {
+            var cfg = ActiveDirectoryConfigFactory.Create();
+
             var services = new ServiceCollection();
             var startup = new Startup();
             startup.ConfigureServices(services);
+
+            using var ctx = new PrincipalContext(ContextType.Domain, "unispace.com", cfg.Username, cfg.Password);
 
             var svc = services.BuildServiceProvider();
             var adWritebackDataClient = svc.GetRequiredService<AdWritebackDataClient>();
@@ -80,16 +86,28 @@ namespace MAD.ActiveDirectory.Push.Services.Tests
 
             var writebackData = await adWritebackDataClient.Get();
 
-            foreach (var wbd in writebackData)
+            using var up = new UserPrincipal(ctx);
+            using var searcher = new PrincipalSearcher(up);
+
+            var bangalore = searcher.FindAll().Where(y => y.DistinguishedName.Contains("Bangalore")).ToList();
+
+            foreach (var sa in bangalore)
             {
-                if (wbd.Email != "abby.kesselman@unispace.com")
+                var deUser = sa.GetUnderlyingObject() as DirectoryEntry;
+                var wbd = writebackData.FirstOrDefault(y => y.Email == sa.UserPrincipalName);
+
+                if (wbd is null)
+                {
                     continue;
+                }
 
                 using var updateTransaction = adUserWriteService.StartUpdateTransaction(wbd);
+
+                if (updateTransaction.HasChanges() == false)
+                    continue;
+
                 await logger.Log(wbd.Email, DateTimeOffset.Now, updateTransaction);
                 updateTransaction.Commit();
-
-                return;
             }
         }
     }
