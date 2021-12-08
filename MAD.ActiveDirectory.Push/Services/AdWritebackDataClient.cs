@@ -1,4 +1,5 @@
-﻿using Microsoft.PowerBI.Api;
+﻿using MAD.ActiveDirectory.Push.Models;
+using Microsoft.PowerBI.Api;
 using Microsoft.Rest;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;

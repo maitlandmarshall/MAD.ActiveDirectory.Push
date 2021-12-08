@@ -9,6 +9,7 @@ using MAD.ActiveDirectory.PushTests;
 using Microsoft.EntityFrameworkCore;
 using MAD.ActiveDirectory.Push.Models;
 using EFCore.BulkExtensions;
+using MAD.ActiveDirectory.Push.Services;
 
 namespace MAD.ActiveDirectory.Push.Actions.Tests
 {
@@ -23,7 +24,7 @@ namespace MAD.ActiveDirectory.Push.Actions.Tests
             using var dbContext = new ADDbContext(new DbContextOptionsBuilder().UseSqlServer(cfg.ConnectionString).Options);
             await dbContext.Database.MigrateAsync();
 
-            var enumUsers = new EnumerateUsers(new Services.PrincipalContextFactory(cfg));
+            var enumUsers = new AdUserReadService(new Services.PrincipalContextFactory(cfg));
             var users = enumUsers.GetUsers().ToList();
 
             await dbContext.BulkInsertOrUpdateAsync(users);

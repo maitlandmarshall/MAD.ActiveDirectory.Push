@@ -1,20 +1,17 @@
 ﻿using EFCore.BulkExtensions;
-using MAD.ActiveDirectory.Push.Actions;
 using MAD.ActiveDirectory.Push.Models;
-using System;
-using System.Collections.Generic;
+using MAD.ActiveDirectory.Push.Services;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MAD.ActiveDirectory.Push.Jobs
 {
     public class UserJobController
     {
-        private readonly EnumerateUsers enumerateUsers;
+        private readonly AdUserReadService enumerateUsers;
         private readonly ADDbContext dbContext;
 
-        public UserJobController(EnumerateUsers enumerateUsers, ADDbContext dbContext)
+        public UserJobController(AdUserReadService enumerateUsers, ADDbContext dbContext)
         {
             this.enumerateUsers = enumerateUsers;
             this.dbContext = dbContext;
@@ -23,7 +20,7 @@ namespace MAD.ActiveDirectory.Push.Jobs
         public async Task ExtractAndLoad()
         {
             var users = this.enumerateUsers.GetUsers().ToList();
-            await dbContext.BulkInsertOrUpdateAsync(users);
+            await this.dbContext.BulkInsertOrUpdateAsync(users);
         }
     }
 }

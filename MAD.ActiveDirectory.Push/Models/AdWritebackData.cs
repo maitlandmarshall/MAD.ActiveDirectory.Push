@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MAD.ActiveDirectory.Push.Services
+namespace MAD.ActiveDirectory.Push.Models
 {
     public class AdWritebackData
     {
