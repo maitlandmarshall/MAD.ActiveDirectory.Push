@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
 using System.Threading.Tasks;
@@ -35,34 +34,10 @@ namespace MAD.ActiveDirectory.Push.Services.Tests
             Assert.IsNotNull(result);
         }
 
-        [TestMethod]
-        public async Task AdWritebackTest()
-        {
-            var services = new ServiceCollection();
-            var startup = new Startup();
-            startup.ConfigureServices(services);
-
-            var svc = services.BuildServiceProvider();
-            var adWritebackDataClient = svc.GetRequiredService<AdWritebackDataClient>();
-            var adUserWriteService = svc.GetRequiredService<AdUserWriteService>();
-            var logger = svc.GetRequiredService<AdUserUpdateTransactionDatabaseLogger>();
-            var dbContext = svc.GetRequiredService<ADDbContext>();
-
-            var writebackData = await adWritebackDataClient.Get(new[] { "'AD OU'[OU_DistinguishedName] = \"Bangalore\"" });
-
-            await dbContext.Database.MigrateAsync();
-
-            foreach (var wbd in writebackData)
-            {
-                using var updateTransaction = adUserWriteService.StartUpdateTransaction(wbd);
-                await logger.Log(wbd.Email, DateTimeOffset.Now, updateTransaction);
-
-                return;
-            }
-        }
-
-        [TestMethod]
-        public async Task AdWritebackCommitTest()
+        // This test method has side effects and will alter AD
+        [DataTestMethod]
+        [DataRow("'AD OU'[OU_DistinguishedName] = \"Bangalore\"", false)]
+        public async Task AdWritebackCommitTest(string filter, bool commit = false)
         {
             var cfg = ActiveDirectoryConfigFactory.Create();
 
@@ -79,30 +54,20 @@ namespace MAD.ActiveDirectory.Push.Services.Tests
             var dbContext = svc.GetRequiredService<ADDbContext>();
             await dbContext.Database.MigrateAsync();
 
-            var writebackData = await adWritebackDataClient.Get();
+            var writebackData = await adWritebackDataClient.Get(new[] { filter });
+            writebackData = writebackData.Take(10);
 
-            using var up = new UserPrincipal(ctx);
-            using var searcher = new PrincipalSearcher(up);
-
-            var bangalore = searcher.FindAll().Where(y => y.DistinguishedName.Contains("Bangalore")).ToList();
-
-            foreach (var sa in bangalore)
+            foreach (var wbd in writebackData)
             {
-                var deUser = sa.GetUnderlyingObject() as DirectoryEntry;
-                var wbd = writebackData.FirstOrDefault(y => y.Email == sa.UserPrincipalName);
-
-                if (wbd is null)
-                {
-                    continue;
-                }
-
                 using var updateTransaction = adUserWriteService.StartUpdateTransaction(wbd);
 
                 if (updateTransaction.HasChanges() == false)
                     continue;
 
                 await logger.Log(wbd.Email, DateTimeOffset.Now, updateTransaction);
-                updateTransaction.Commit();
+
+                if (commit)
+                    updateTransaction.Commit();
             }
         }
     }
