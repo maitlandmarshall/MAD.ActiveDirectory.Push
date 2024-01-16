@@ -1,18 +1,13 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MAD.ActiveDirectory.Push.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MAD.ActiveDirectory.Push.Models;
 using MAD.ActiveDirectory.PushTests;
-using MAD.ActiveDirectory.Push.Jobs;
-using Microsoft.Extensions.DependencyInjection;
-using Hangfire;
-using MAD.ActiveDirectory.Push.Models;
 using Microsoft.EntityFrameworkCore;
-using System.DirectoryServices.AccountManagement;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.DirectoryServices;
+using System.DirectoryServices.AccountManagement;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MAD.ActiveDirectory.Push.Services.Tests
 {
@@ -35,7 +30,9 @@ namespace MAD.ActiveDirectory.Push.Services.Tests
             var aadAuthClient = new AadAuthClient(cfg);
             var adWritebackDataClient = new AdWritebackDataClient(aadAuthClient, cfg);
 
-            await adWritebackDataClient.Get();
+            var result = await adWritebackDataClient.Get();
+
+            Assert.IsNotNull(result);
         }
 
         [TestMethod]
@@ -50,15 +47,13 @@ namespace MAD.ActiveDirectory.Push.Services.Tests
             var adUserWriteService = svc.GetRequiredService<AdUserWriteService>();
             var logger = svc.GetRequiredService<AdUserUpdateTransactionDatabaseLogger>();
             var dbContext = svc.GetRequiredService<ADDbContext>();
-            await dbContext.Database.MigrateAsync();
 
-            var writebackData = await adWritebackDataClient.Get();
+            var writebackData = await adWritebackDataClient.Get(new[] { "'AD OU'[OU_DistinguishedName] = \"Bangalore\"" });
+
+            await dbContext.Database.MigrateAsync();
 
             foreach (var wbd in writebackData)
             {
-                if (wbd.Email != "abby.kesselman@unispace.com")
-                    continue;
-
                 using var updateTransaction = adUserWriteService.StartUpdateTransaction(wbd);
                 await logger.Log(wbd.Email, DateTimeOffset.Now, updateTransaction);
 

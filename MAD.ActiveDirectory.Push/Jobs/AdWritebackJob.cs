@@ -1,12 +1,7 @@
 ﻿using Hangfire;
 using MAD.ActiveDirectory.Push.Models;
 using MAD.ActiveDirectory.Push.Services;
-using MAD.Integration.Common.Jobs;
 using System;
-using System.Collections.Generic;
-using System.DirectoryServices;
-using System.DirectoryServices.AccountManagement;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MAD.ActiveDirectory.Push.Jobs
@@ -18,7 +13,7 @@ namespace MAD.ActiveDirectory.Push.Jobs
         private readonly IBackgroundJobClient backgroundJobClient;
         private readonly AdUserUpdateTransactionDatabaseLogger databaseLogger;
 
-        public AdWritebackJob(AdUserWriteService adUserWriteService, AdWritebackDataClient adWritebackDataClient,  IBackgroundJobClient backgroundJobClient, AdUserUpdateTransactionDatabaseLogger databaseLogger)
+        public AdWritebackJob(AdUserWriteService adUserWriteService, AdWritebackDataClient adWritebackDataClient, IBackgroundJobClient backgroundJobClient, AdUserUpdateTransactionDatabaseLogger databaseLogger)
         {
             this.backgroundJobClient = backgroundJobClient;
             this.databaseLogger = databaseLogger;
@@ -32,9 +27,6 @@ namespace MAD.ActiveDirectory.Push.Jobs
 
             foreach (var wbd in writebackData)
             {
-                if (wbd.Email != "abby.kesselman@unispace.com")
-                    continue;
-
                 this.backgroundJobClient.Enqueue<AdWritebackJob>(y => y.UpdateUser(wbd));
             }
         }
