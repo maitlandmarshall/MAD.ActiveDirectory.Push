@@ -12,10 +12,10 @@ namespace MAD.ActiveDirectory.Push.Models
         public string Attribute { get; set; }
 
         [JsonProperty("User Comparison[AD]")]
-        public string AD { get; set; }
+        public string OldValue { get; set; }
 
         [JsonProperty("User Comparison[Namely]")]
-        public string Namely { get; set; }
+        public string NewValue { get; set; }
     }
 
     public class AdWritebackData
