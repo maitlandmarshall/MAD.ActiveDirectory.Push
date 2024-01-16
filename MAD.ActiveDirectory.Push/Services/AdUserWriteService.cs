@@ -34,7 +34,14 @@ namespace MAD.ActiveDirectory.Push.Services
             {
                 var propToOverwrite = original.Properties[delta.Attribute];
                 var newValue = delta.NewValue;
-                var oldValue = delta.OldValue;
+                var oldValue = propToOverwrite.Value;
+
+                if (newValue is null
+                    && oldValue is null)
+                    continue;
+
+                if (newValue?.Equals(oldValue) == true)
+                    continue;
 
                 // Return the properties to update
                 yield return new UpdateTarget
