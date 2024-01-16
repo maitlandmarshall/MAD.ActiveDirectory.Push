@@ -28,7 +28,7 @@ namespace MAD.ActiveDirectory.Push.Services
             {
                 Queries = new[]
                 {
-                    new Microsoft.PowerBI.Api.Models.DatasetExecuteQueriesQuery ("evaluate FILTER('_Writeback Data', [Has Update] = TRUE() && [Manager Is Mapped] = TRUE() && [Source] = \"Update\")")
+                    new Microsoft.PowerBI.Api.Models.DatasetExecuteQueriesQuery ("evaluate FILTER('User Comparison', 'User Comparison'[HasChanged] = TRUE())")
                 }
             });
 
@@ -38,10 +38,16 @@ namespace MAD.ActiveDirectory.Push.Services
                 .Tables
                 .First()
                 .Rows
-                .Cast<JObject>()
-                .Select(y => y.ToObject<AdWritebackData>());
+                .ToList();
 
-            return rows.ToList();
+            var deltas = rows
+                .Cast<JObject>()
+                .Select(y => y.ToObject<AdWritebackDelta>())
+                .GroupBy(y => y.Email)
+                .ToDictionary(y => y.Key, y => y.ToList());
+
+            return rows.Cast<JObject>()
+                .Select(y => y.ToObject<AdWritebackData>());
         }
     }
 }

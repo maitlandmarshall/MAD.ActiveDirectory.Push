@@ -1,10 +1,22 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MAD.ActiveDirectory.Push.Models
 {
+    public class AdWritebackDelta
+    {
+        [JsonProperty("User Comparison[Email]")]
+        public string Email { get; set; }
+
+        [JsonProperty("User Comparison[Attribute]")]
+        public string Attribute { get; set; }
+
+        [JsonProperty("User Comparison[AD]")]
+        public string AD { get; set; }
+
+        [JsonProperty("User Comparison[Namely]")]
+        public string Namely { get; set; }
+    }
+
     public class AdWritebackData
     {
         [JsonProperty("_Writeback Data[Source]")]
