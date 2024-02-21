@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MAD.ActiveDirectory.Push.Models
 {
@@ -40,5 +37,7 @@ namespace MAD.ActiveDirectory.Push.Models
         public string Manager { get; set; }
 
         public DateTime ExtractedDate { get; set; }
+
+        public IDictionary<string, object> AdditionalProperties { get; set; }
     }
 }

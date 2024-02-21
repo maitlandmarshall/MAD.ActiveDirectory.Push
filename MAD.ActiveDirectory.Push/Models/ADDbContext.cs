@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MAD.ActiveDirectory.Push.Models
 {
@@ -24,6 +19,10 @@ namespace MAD.ActiveDirectory.Push.Models
             modelBuilder.Entity<User>(cfg =>
             {
                 cfg.HasKey(y => new { y.Id, y.ExtractedDate });
+
+                cfg.Property(y => y.AdditionalProperties).HasConversion(
+                    y => JsonConvert.SerializeObject(y),
+                    y => JsonConvert.DeserializeObject<Dictionary<string, object>>(y));
             });
 
             modelBuilder.Entity<AdWritebackLog>(cfg =>

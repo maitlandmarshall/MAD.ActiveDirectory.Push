@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
-using System.Text;
 
 namespace MAD.ActiveDirectory.Push.Services
 {
@@ -69,6 +68,25 @@ namespace MAD.ActiveDirectory.Push.Services
                 ExtensionAttribute7 = this.GetPropertyValue("extensionAttribute7", de),
                 Manager = this.GetPropertyValue("manager", de)
             };
+
+            // Serialize remaining properties as JSON and store in AdditionalProperties column
+            var additionalProperties = new Dictionary<string, object>();
+            var usrType = typeof(User);
+
+            foreach (var property in de.Properties.PropertyNames)
+            {
+                var propertyName = property.ToString();
+
+                // If we're manually explicitly tracking the property, skip it.
+                if (usrType.GetProperty(propertyName) is null == false)
+                    continue;
+
+                var propertyValue = this.GetPropertyValue(propertyName, de);
+                additionalProperties.Add(propertyName, propertyValue);
+
+            }
+
+            usr.AdditionalProperties = additionalProperties;
 
             return usr;
         }
